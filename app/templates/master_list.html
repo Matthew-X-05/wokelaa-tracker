@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ cfg.judul }}</h1>
+<div class="bar"><a class="btn push" href="{{ url_for('master_form', tabel=tabel) }}">Tambah {{ cfg.judul|lower }}</a></div>
+<div class="card">
+  {% if rows %}
+  <table>
+    <tr>{% for c, label in cfg.fields %}<th>{{ label }}</th>{% endfor %}<th></th></tr>
+    {% for r in rows %}
+    <tr>
+      {% for c, label in cfg.fields %}<td>{{ r[c] }}</td>{% endfor %}
+      <td>
+        <a class="btn ghost" href="{{ url_for('master_form', tabel=tabel, id=r.id) }}">Ubah</a>
+        <form class="inline" method="post" action="{{ url_for('master_hapus', tabel=tabel, id=r.id) }}" onsubmit="return confirm('Hapus data ini?')">
+          <button class="btn danger" type="submit">Hapus</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="kosong">Belum ada data. Tambahkan yang pertama.</div>
+  {% endif %}
+</div>
+{% endblock %}

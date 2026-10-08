@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% macro due(t, today) %}{% set sisa = (t.deadline - today).days %}
+<span class="{{ 'telat' if sisa < 0 and t.status != 'Selesai' else ('dekat' if sisa <= 3 and t.status != 'Selesai' else '') }}">{{ t.deadline.strftime('%d %b %Y') }}{% if t.status != 'Selesai' %}{% if sisa < 0 %} · lewat {{ -sisa }} hari{% elif sisa == 0 %} · hari ini{% elif sisa <= 3 %} · {{ sisa }} hari lagi{% endif %}{% endif %}</span>{% endmacro %}
+{% macro pindah(t, ke, label, ghost=True) %}
+<form class="inline" method="post" action="{{ url_for('tugas_status', id=t.id) }}"><input type="hidden" name="status" value="{{ ke }}"><button class="btn sm {{ 'ghost' if ghost }}" type="submit">{{ label }}</button></form>{% endmacro %}
+{% block content %}
+<h1>Papan tugas</h1>
+<p class="sub">Pantau progres tugas kelompok dan deadline terdekat.</p>
+<div class="stats">
+  <div class="stat"><b>{{ total }}</b><small>Total tugas</small></div>
+  <div class="stat belum"><b>{{ ringkasan.get('Belum dikerjakan', 0) }}</b><small>Belum dikerjakan</small></div>
+  <div class="stat sedang"><b>{{ ringkasan.get('Sedang dikerjakan', 0) }}</b><small>Sedang dikerjakan</small></div>
+  <div class="stat selesai"><b>{{ ringkasan.get('Selesai', 0) }}</b><small>Selesai</small></div>
+  <div class="stat"><b>{{ persen }}%</b><small>Progres keseluruhan</small><div class="prog"><i style="width:{{ persen }}%"></i></div></div>
+</div>
+<form class="bar" method="get">
+  <input type="hidden" name="view" value="{{ view }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="Cari judul tugas" aria-label="Cari judul tugas">
+  <select name="status" aria-label="Filter status"><option value="">Semua status</option>{% for s in status_list %}<option {{ 'selected' if s == f_status }}>{{ s }}</option>{% endfor %}</select>
+  <select name="anggota" aria-label="Filter penanggung jawab"><option value="">Semua anggota</option>{% for a in anggota_list %}<option value="{{ a.id }}" {{ 'selected' if a.id|string == f_anggota }}>{{ a.nama }} ({{ a.nim }})</option>{% endfor %}</select>
+  <button class="btn ghost" type="submit">Terapkan</button>
+  <span class="seg push">
+    <a class="{{ 'on' if view == 'board' }}" href="{{ url_for('tugas_list', view='board', q=q, status=f_status, anggota=f_anggota) }}">Papan</a>
+    <a class="{{ 'on' if view == 'list' }}" href="{{ url_for('tugas_list', view='list', q=q, status=f_status, anggota=f_anggota) }}">Daftar</a>
+  </span>
+  <a class="btn ghost" href="{{ url_for('tugas_export') }}">Ekspor CSV</a>
+  <a class="btn" href="{{ url_for('tugas_form') }}">Tambah tugas</a>
+</form>
+
+{% if view == 'board' %}
+<div class="board">
+  {% for s in status_list %}
+  <section class="kol">
+    <h2>{{ s }} <span class="tag {{ s.split()[0] }}">{{ kolom[s]|length }}</span></h2>
+    {% for t in kolom[s] %}
+    <article class="kartu">
+      <h3>{{ t.judul }}</h3>
+      <p class="meta">{{ t.matkul }}</p>
+      <p class="meta">{{ t.anggota }} ({{ t.nim }})</p>
+      <p class="due">{{ due(t, today) }}</p>
+      <div class="aksi">
+        {% if s == 'Belum dikerjakan' %}{{ pindah(t, 'Sedang dikerjakan', 'Mulai', False) }}
+        {% elif s == 'Sedang dikerjakan' %}{{ pindah(t, 'Selesai', 'Selesai', False) }}{{ pindah(t, 'Belum dikerjakan', 'Tunda') }}
+        {% else %}{{ pindah(t, 'Sedang dikerjakan', 'Buka lagi') }}{% endif %}
+        <a class="btn sm ghost" href="{{ url_for('tugas_form', id=t.id) }}">Ubah</a>
+        <form class="inline" method="post" action="{{ url_for('tugas_hapus', id=t.id) }}" onsubmit="return confirm('Hapus tugas ini?')"><button class="btn sm danger" type="submit">Hapus</button></form>
+      </div>
+    </article>
+    {% else %}<div class="kosong">Belum ada tugas di sini.</div>{% endfor %}
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  {% if rows %}
+  <table>
+    <tr><th>Judul</th><th>Mata kuliah</th><th>Penanggung jawab</th><th>Deadline</th><th>Status</th><th></th></tr>
+    {% for t in rows %}
+    <tr>
+      <td>{{ t.judul }}</td><td>{{ t.matkul }}</td><td>{{ t.anggota }} ({{ t.nim }})</td>
+      <td>{{ due(t, today) }}</td>
+      <td><span class="tag {{ t.status.split()[0] }}">{{ t.status }}</span></td>
+      <td>
+        <a class="btn sm ghost" href="{{ url_for('tugas_form', id=t.id) }}">Ubah</a>
+        <form class="inline" method="post" action="{{ url_for('tugas_hapus', id=t.id) }}" onsubmit="return confirm('Hapus tugas ini?')"><button class="btn sm danger" type="submit">Hapus</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<div class="kosong">Belum ada tugas yang cocok. Tambahkan tugas baru atau ubah filternya.</div>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

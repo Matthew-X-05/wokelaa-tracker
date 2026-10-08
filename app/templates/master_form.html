@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Ubah' if data else 'Tambah' }} {{ cfg.judul|lower }}</h1>
+<form class="box" method="post">
+  {% for c, label in cfg.fields %}
+  <label>{{ label }}
+    <input name="{{ c }}" required maxlength="100" value="{{ data[c] if data else '' }}">
+  </label>
+  {% endfor %}
+  <button class="btn" type="submit">Simpan</button>
+  <a class="btn ghost" href="{{ url_for('master_list', tabel=tabel) }}">Batal</a>
+</form>
+{% endblock %}

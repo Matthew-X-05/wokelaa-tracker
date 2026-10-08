@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracker Tugas Wokelaa</title>
+<style>
+:root{--bg:#eef2f7;--card:#fff;--ink:#0f1b2d;--muted:#5d6b82;--line:#d9e0ea;--brand:#0d7c8a;--brand-ink:#fff;--belum:#8a5a00;--belum-bg:#fdf1d8;--sedang:#1d4ed8;--sedang-bg:#e0eaff;--selesai:#166534;--selesai-bg:#dcf5e4;--bad:#b42323}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1622;--card:#16202f;--ink:#e8eef8;--muted:#9aa8bf;--line:#26344a;--brand:#38bdc9;--brand-ink:#04222a;--belum:#f5c56b;--belum-bg:#3a2d10;--sedang:#8fb3ff;--sedang-bg:#1a2a52;--selesai:#7ddc9c;--selesai-bg:#12341f;--bad:#ff8a8a}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 24px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center}
+.brand{font-weight:700;font-size:1.15rem;margin-right:auto;letter-spacing:-.01em}
+.brand span{color:var(--brand)}
+header a.nav{color:var(--muted);text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent}
+header a.nav:hover{color:var(--ink);border-color:var(--brand)}
+main{max-width:1080px;margin:24px auto;padding:0 16px}
+h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat b{display:block;font-size:1.7rem;line-height:1.1}
+.stat small{color:var(--muted)}
+.stat.belum b{color:var(--belum)}.stat.sedang b{color:var(--sedang)}.stat.selesai b{color:var(--selesai)}
+.prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:var(--brand)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+.bar .push{margin-left:auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg a{padding:7px 12px;color:var(--muted);text-decoration:none;background:var(--card)}
+.seg a.on{background:var(--brand);color:var(--brand-ink)}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;align-items:start}
+.kol{background:color-mix(in srgb,var(--line) 45%,transparent);border-radius:10px;padding:10px}
+.kol h2{font-size:.95rem;margin:2px 4px 10px;display:flex;justify-content:space-between}
+.kartu{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px}
+.kartu h3{font-size:1rem;margin:0 0 6px}
+.meta{margin:0;color:var(--muted);font-size:.88rem}
+.due{margin:8px 0;font-size:.88rem;font-weight:600}
+.aksi{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.kosong{padding:24px;text-align:center;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.85rem;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.btn{display:inline-block;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);padding:6px 12px;border-radius:6px;text-decoration:none;font:inherit;font-size:.9rem;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand)}
+.btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:3px 9px;font-size:.82rem}
+.inline{display:inline}
+input,select{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--card);color:var(--ink);width:100%}
+.bar input,.bar select{width:auto}
+label{display:block;margin-bottom:14px;font-size:.9rem;color:var(--muted)}
+label input,label select{margin-top:4px}
+form.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;max-width:480px}
+.msg{padding:10px 14px;border-radius:6px;margin-bottom:16px}
+.msg.ok{background:var(--selesai-bg);color:var(--selesai)}
+.msg.err{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.tag{font-size:.78rem;padding:2px 9px;border-radius:99px;white-space:nowrap;font-weight:600}
+.tag.Belum{background:var(--belum-bg);color:var(--belum)}
+.tag.Sedang{background:var(--sedang-bg);color:var(--sedang)}
+.tag.Selesai{background:var(--selesai-bg);color:var(--selesai)}
+.dekat{color:var(--belum)}.telat{color:var(--bad)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Tracker Tugas <span>Wokelaa</span></div>
+  <a class="nav" href="{{ url_for('tugas_list') }}">Tugas</a>
+  <a class="nav" href="{{ url_for('master_list', tabel='anggota') }}">Anggota</a>
+  <a class="nav" href="{{ url_for('master_list', tabel='matkul') }}">Mata kuliah</a>
+</header>
+<main>
+{% with msgs = get_flashed_messages(with_categories=true) %}{% for cat, m in msgs %}<div class="msg {{ cat }}">{{ m }}</div>{% endfor %}{% endwith %}
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

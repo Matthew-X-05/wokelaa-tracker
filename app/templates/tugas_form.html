@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Ubah tugas' if data else 'Tambah tugas' }}</h1>
+<form class="box" method="post">
+  <label>Judul
+    <input name="judul" required maxlength="150" value="{{ data.judul if data else '' }}">
+  </label>
+  <label>Deadline
+    <input type="date" name="deadline" required value="{{ data.deadline if data else '' }}">
+  </label>
+  <label>Status
+    <select name="status">
+      {% for s in status_list %}<option {{ 'selected' if data and data.status == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Penanggung jawab
+    <select name="id_anggota" required>
+      {% for a in anggota_list %}<option value="{{ a.id }}" {{ 'selected' if data and data.id_anggota == a.id }}>{{ a.nama }} ({{ a.nim }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Mata kuliah
+    <select name="id_matkul" required>
+      {% for m in matkul_list %}<option value="{{ m.id }}" {{ 'selected' if data and data.id_matkul == m.id }}>{{ m.nama_matkul }}</option>{% endfor %}
+    </select>
+  </label>
+  <button class="btn" type="submit">Simpan tugas</button>
+  <a class="btn ghost" href="{{ url_for('tugas_list') }}">Batal</a>
+</form>
+{% endblock %}
