@@ -2,6 +2,7 @@ import csv
 import io
 import os
 import time
+import socket
 from datetime import date
 
 import mysql.connector
@@ -9,6 +10,10 @@ from flask import Flask, Response, abort, flash, redirect, render_template, requ
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-key")
+
+@app.context_processor
+def info_container():
+    return {"container_id": socket.gethostname()}
 
 STATUS = ["Belum dikerjakan", "Sedang dikerjakan", "Selesai"]
 
